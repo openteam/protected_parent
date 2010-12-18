@@ -13,16 +13,16 @@ require 'jeweler'
 Jeweler::Tasks.new do |gem|
   # gem is a Gem::Specification... see http://docs.rubygems.org/read/chapter/20 for more options
   gem.name = "protected_parent"
-  gem.homepage = "http://github.com/lda/protected_parent"
+  gem.homepage = "http://github.com/openteam/protected_parent"
   gem.license = "MIT"
-  gem.summary = %Q{TODO: one-line summary of your gem}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.summary = %Q{Protect a parent record from deletion when it has specified child records}
+  gem.description = %Q{Stops the deletion of an ActiveRecord object when members of a specified child association exist.}
   gem.email = "lda@openteam.ru"
-  gem.authors = ["Dmitry Lihachev"]
+  gem.authors = ["Tim Harvey", "Dmitry Lihachev"]
   # Include your dependencies below. Runtime dependencies are required when using your gem,
   # and development dependencies are only needed for development (ie running rake tasks, tests, etc)
   #  gem.add_runtime_dependency 'jabber4r', '> 0.1'
-  #  gem.add_development_dependency 'rspec', '> 1.2.3'
+  gem.add_development_dependency 'rspec', '> 1.2.3'
 end
 Jeweler::RubygemsDotOrgTasks.new
 
