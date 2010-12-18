@@ -1,39 +1,54 @@
+#encoding: utf-8
 module ProtectedParent
   def self.included(base)
     base.send :extend, ClassMethods
+    base.send :include, InstanceMethods
   end
-  
+
   module ClassMethods
+
     def protected_parent_of(*children_names)
-      cattr_accessor :children_of_protected_parent                                # Define a method to hold the children methods
-      self.children_of_protected_parent ||= []                                    # Set the initial value, only if nil
-      children_names.each do |child_name|                                         # Loop through the children given
-        self.children_of_protected_parent << child_name.to_s                      # Add each to the array
+
+      @softly_protected = children_names.extract_options!.delete(:protects) == :softly
+
+      children_names.each do |child_name|
+        self.children_of_protected_parent << child_name.to_s
       end
-      
-      before_destroy :removable?                                                  # Create the callback to block deletes if appropriate
-      send :include, InstanceMethods                                              # Add the methods needed
+
+      before_destroy :removable?
     end
+
+    def children_of_protected_parent
+      @children_of_protected_parent ||= []
+    end
+
+    def softly_protected
+      @softly_protected
+    end
+
   end
-  
+
   module InstanceMethods
     # Can the instance be deleted?
     def removable?
-      self.class.children_of_protected_parent.each do |child|                     # Loop through all the children 
+      self.class.softly_protected || protected_children.empty?
+    end
+
+    def protected_children
+      self.class.children_of_protected_parent.select do |child|
         if a_plural child
-          return false if send("#{child}").size > 0                               # For plural children, see if there's at least 1
+          child unless send(child).count.zero?
         else
-          return false unless send("#{child}").nil?                               # For singular children, make sure it's not nil
+          child unless send(child).nil?
         end
       end
-      true
     end
-    
+
     # The inverse of removable?, is this instance protected from deletion?
     def protected?
       !removable?
     end
-    
+
     def a_plural(child)
       child.pluralize == child
     end
